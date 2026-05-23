@@ -85,7 +85,14 @@ const getSingleIssueFromDB = async (id: number) => {
 
 const updateIssueIntoDB = async (issueId: number, payload: JwtPayload) => {
     const { id, role } = payload.user;
-    const { title, description, type, status } = payload.body;
+    const { title, description, type, status: updatedStatus } = payload.body;
+
+    const resolvedOrNot = await pool.query(`
+        SELECT status FROM issues WHERE id = $1 
+        `, [issueId]);
+    const { status } = resolvedOrNot.rows[0];
+    if (status === ISSUE_STATUS.resolved)
+        return false;
 
     if (role === USER_ROLE.maintainer) {
         const result = await pool.query(`
@@ -96,7 +103,7 @@ const updateIssueIntoDB = async (issueId: number, payload: JwtPayload) => {
         status = COALESCE($4, status),
         updated_at = NOW()
         WHERE id = $5 RETURNING *;
-        `, [title, description, type, status, issueId]);
+        `, [title, description, type, updatedStatus, issueId]);
         return result;
     }
 
@@ -111,7 +118,7 @@ const updateIssueIntoDB = async (issueId: number, payload: JwtPayload) => {
         WHERE id = $5 AND 
         reporter_id = $6 AND 
         status = 'open' RETURNING *;
-        `, [title, description, type, status, issueId, id]);
+        `, [title, description, type, updatedStatus, issueId, id]);
         return result;
     }
 }

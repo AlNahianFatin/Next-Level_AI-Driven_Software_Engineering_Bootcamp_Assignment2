@@ -73,6 +73,15 @@ const updateIssue = async (req: Request, res: Response) => {
     try {
         const result = await issueService.updateIssueIntoDB(Number(req?.params?.id), req);
 
+        if(!result) {
+            sendResponse(res, {
+                statusCode: 409,
+                success: false,
+                message: `Issue already resolved!`
+            });
+            return;
+        }
+
         if (result?.rowCount !== 1) {
             sendResponse(res, {
                 statusCode: 404,
