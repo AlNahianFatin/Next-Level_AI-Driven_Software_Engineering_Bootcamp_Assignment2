@@ -41,10 +41,36 @@ const getAllIssues = async (req: Request, res: Response) => {
     }
 }
 
+const getSingleIssue = async (req: Request, res: Response) => {
+    try {
+        const result = await issueService.getSingleIssueFromDB(Number(req?.params?.id));
 
-
+        if (!result.id) {
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: `Issue with id ${req?.params?.id} not found`,
+            });
+            return;
+        }
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            data: result
+        });
+    } 
+    catch (error: any) {
+        sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: error.message,
+            error: error,
+        });
+    }
+}
 
 export const issueController = {
     createIssue,
-    getAllIssues
+    getAllIssues,
+    getSingleIssue
 }
