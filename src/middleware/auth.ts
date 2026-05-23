@@ -26,7 +26,7 @@ const auth = (...roles: ROLES[]) => {
                 });
             }
 
-            req.user = decoded;
+            // req.user = decoded;
 
             if (roles.length && !roles.includes(decoded.role)) {
                 sendResponse(res, {
