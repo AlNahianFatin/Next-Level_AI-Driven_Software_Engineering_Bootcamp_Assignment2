@@ -1,10 +1,13 @@
-import { Router } from "express";
-import { issueController } from "./issue.controller"
+import type { STATUS } from "../../types/issueStatus";
+import type { ISSUES } from "../../types/issueTypes";
 
-
-const router = Router();
-
-router.get("/", issueController.getAllIssues);
-
-
-export const issueRoute = router;
+export interface IIssue {
+    id: number,
+    title: string,
+    description: string,
+    type?: ISSUES,
+    status?: STATUS,
+    reporter_id: number,
+    created_at?: Date,
+    updated_at?: Date
+}
