@@ -6,8 +6,7 @@ A role-based Issue Tracking REST API built with Express.js, TypeScript, PostgreS
 
 ## 🚀 Live Links
 
-- Backend Live Link: _Add your deployed backend URL here_
-- Frontend Live Link: _Add your frontend URL here_
+- [https://devpulse-puce-iota.vercel.app/](https://devpulse-puce-iota.vercel.app/)
 
 ---
 
