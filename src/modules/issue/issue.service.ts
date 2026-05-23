@@ -1,4 +1,7 @@
+import type { JwtPayload } from "jsonwebtoken";
 import { pool } from "../../db";
+import { ISSUE_STATUS } from "../../types/issueStatus";
+import { USER_ROLE } from "../../types/roleTypes";
 import type { IIssue } from "./issue.interface";
 
 
@@ -80,8 +83,42 @@ const getSingleIssueFromDB = async (id: number) => {
     return formattedData;
 }
 
+const updateIssueIntoDB = async (issueId: number, payload: JwtPayload) => {
+    const { id, role } = payload.user;
+    const { title, description, type, status } = payload.body;
+
+    if (role === USER_ROLE.maintainer) {
+        const result = await pool.query(`
+        UPDATE issues SET 
+        title = COALESCE($1, title), 
+        description = COALESCE($2, description), 
+        type = COALESCE($3, type),
+        status = COALESCE($4, status),
+        updated_at = NOW()
+        WHERE id = $5 RETURNING *;
+        `, [title, description, type, status, issueId]);
+        return result;
+    }
+
+    if (role === USER_ROLE.contributor) {
+        const result = await pool.query(`
+        UPDATE issues SET 
+        title = COALESCE($1, title), 
+        description = COALESCE($2, description), 
+        type = COALESCE($3, type),
+        status = COALESCE($4, status),
+        updated_at = NOW()
+        WHERE id = $5 AND 
+        reporter_id = $6 AND 
+        status = 'open' RETURNING *;
+        `, [title, description, type, status, issueId, id]);
+        return result;
+    }
+}
+
 export const issueService = {
     createIssueIntoDB,
     getAllIssuesFromDB,
-    getSingleIssueFromDB
+    getSingleIssueFromDB,
+    updateIssueIntoDB
 }
