@@ -1,9 +1,8 @@
-import type { JwtPayload } from "jsonwebtoken";
 import { pool } from "../../db";
-import { ISSUE_STATUS } from "../../types/issueStatus";
-import { USER_ROLE } from "../../types/roleTypes";
 import type { IIssue } from "./issue.interface";
-
+import { ISSUE_STATUS  } from "../../types/issueStatus";
+import { USER_ROLE } from "../../types/roleTypes";
+import type { JwtPayload } from "jsonwebtoken";
 
 const createIssueIntoDB = async (payload: IIssue, reporter_id: number) => {
     const { title, description, type } = payload;
@@ -123,9 +122,16 @@ const updateIssueIntoDB = async (issueId: number, payload: JwtPayload) => {
     }
 }
 
+const deleteIssueFromDB = async (id: number) => {
+    const result = await pool.query(`
+        DELETE FROM issues WHERE id = $1;`, [id]);
+    return result;
+}
+
 export const issueService = {
     createIssueIntoDB,
     getAllIssuesFromDB,
     getSingleIssueFromDB,
-    updateIssueIntoDB
+    updateIssueIntoDB,
+    deleteIssueFromDB
 }
